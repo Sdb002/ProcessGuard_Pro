@@ -5,27 +5,6 @@ Built with Python 3 · Dear PyGui · psutil · SQLite
 
 ---
 
-## 🆕 What's New in v2.0
-
-| Feature | v1 | v2 |
-|---|---|---|
-| Thread-safe UI updates | ✗ (race conditions) | ✅ Queue-based |
-| CPU % measurement | Slow (0.05s per process) | ✅ Fast (interval=None, pre-warmed) |
-| Alert thresholds | Hardcoded constants | ✅ Configurable sliders in Settings tab |
-| Disk alert | Shown but never fired | ✅ Full alert + log |
-| Auto-kill rules | Shell script only | ✅ GUI rule builder + duration tracking |
-| Process table cap | 60 rows hardcoded | ✅ Paginated (200+ rows) |
-| Whitelist | Flat string list | ✅ Regex/glob patterns via config |
-| Per-process history | ✗ | ✅ 60-tick CPU/MEM sparklines in popup |
-| History & reports | Single-snapshot HTML | ✅ SQLite trend data + 24h sparklines |
-| Alert log | File only | ✅ Live in-app viewer tab |
-| Network stats | ✗ | ✅ Total net sent/recv in status bar |
-| Swap stats | ✗ | ✅ Swap bar in header |
-| RSS memory column | ✗ | ✅ Per-process RSS MB column |
-| Tray icon | ✗ | ✅ pystray (optional) |
-| Docker image | ✗ | ✅ Full self-contained Dockerfile |
-
----
 
 ## 🚀 Quick Start
 
