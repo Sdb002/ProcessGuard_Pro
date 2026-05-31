@@ -1,4 +1,4 @@
-# ⚙ ProcessGuard Pro v2.0
+# ⚙ ProcessGuard Pro 
 
 **Linux Process Monitor & Auto-Kill System**  
 Built with Python 3 · Dear PyGui · psutil · SQLite
