@@ -1,5 +1,7 @@
 # ⚙ ProcessGuard Pro 
 
+[![tests](https://github.com/Sdb002/ProcessGuard_Pro/actions/workflows/tests.yml/badge.svg)](https://github.com/Sdb002/ProcessGuard_Pro/actions/workflows/tests.yml)
+
 **Linux Process Monitor & Auto-Kill System**  
 Built with Python 3 · Dear PyGui · psutil · SQLite
 
@@ -62,7 +64,7 @@ processguard_pro/
 ├── main.py                ← GUI entry point (tabs, thread-safe queue)
 ├── config.py              ← JSON config manager (thresholds, whitelist, rules)
 ├── process_scanner.py     ← psutil data layer + per-process history rings
-├── kill_manager.py        ← kill/suspend/resume/nice with regex whitelist
+├── kill_manager.py        ← kill/suspend/resume/nice with a name/glob whitelist
 ├── alert_engine.py        ← CPU/RAM/Disk alerts, JSONL log, cooldown
 ├── autokill_engine.py     ← Rule-based auto-kill with duration tracking
 ├── reporter.py            ← SQLite history + HTML reports with sparklines
@@ -96,6 +98,19 @@ processguard_pro/
 
 ---
 
+## 🧪 Tests
+
+The engines behind the UI have a pytest suite, run on every push by GitHub Actions (Python 3.10–3.13). It needs only `psutil`:
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+It covers config persistence and reset, whitelist matching, suspend/resume/kill/renice against a real child process, auto-kill timing (threshold held for the full duration, timer reset on cool-down, disabled rules, bad regexes), alert thresholds and cooldown, and the history database, including a regression test for a pruning deadlock. Each test runs against its own temporary config, log and database.
+
+**Whitelist matching:** entries match whole process names, case-insensitively, and accept shell-style globs (`gnome-*`, `kwin*`). `sh` protects `sh`, not every process with "sh" in its name.
+
 ## 🖥️ UI Tabs
 
 ### 📊 Monitor Tab
@@ -122,7 +137,7 @@ processguard_pro/
 - Sliders for CPU/RAM/Disk alert thresholds and cooldown period
 - Slider for refresh interval (0.5s–10s)
 - Max table rows control
-- Multi-line whitelist editor (one entry per line, supports regex)
+- Multi-line whitelist editor (one process name per line, globs like `gnome-*` allowed)
 - Save / Reset to defaults
 
 ---

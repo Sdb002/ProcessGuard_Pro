@@ -2,7 +2,7 @@
 config.py — Centralized configuration with JSON persistence.
 All thresholds, whitelist, auto-kill rules, and UI prefs live here.
 """
-import json, os, threading
+import copy, json, os, threading
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
 
@@ -15,9 +15,9 @@ DEFAULTS = {
     "autokill_rules": [],          # list of {name_pattern, cpu_thresh, mem_thresh, duration_sec}
     "whitelist": [
         "systemd", "init", "sshd", "bash", "sh", "python3",
-        "dearpygui", "main.py", "Xorg", "dbus-daemon",
-        "NetworkManager", "code", "gnome", "kwin", "plasmashell"
-    ],
+        "Xorg", "dbus-daemon", "NetworkManager", "code",
+        "gnome-*", "kwin*", "plasmashell"
+    ],                             # exact process names, or globs (see kill_manager)
     "theme": "dark_green",
     "max_table_rows": 200,
     "report_top_n": 50,
@@ -34,11 +34,21 @@ def load():
             try:
                 with open(CONFIG_PATH) as f:
                     saved = json.load(f)
-                _cfg = {**DEFAULTS, **saved}
+                _cfg = {**copy.deepcopy(DEFAULTS), **saved}
                 return
             except Exception:
                 pass
-        _cfg = dict(DEFAULTS)
+        # deep copy: rules and whitelist are lists, and a shallow copy let
+        # add_autokill_rule() append to DEFAULTS itself
+        _cfg = copy.deepcopy(DEFAULTS)
+        _save_unlocked()
+
+
+def reset():
+    """Restore every setting to its default and save."""
+    global _cfg
+    with _lock:
+        _cfg = copy.deepcopy(DEFAULTS)
         _save_unlocked()
 
 

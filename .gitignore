@@ -1,0 +1,8 @@
+# runtime state written next to the code
+config.json
+logs/
+reports/
+__pycache__/
+.pytest_cache/
+*.pyc
+.venv/
