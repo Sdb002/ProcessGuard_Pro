@@ -1,0 +1,4 @@
+# the engines (config, kill manager, auto-kill, alerts, history) need only
+# psutil; the GUI packages are not required to run the tests
+psutil>=5.9.0
+pytest>=7
