@@ -24,6 +24,9 @@ os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
 
 _db_lock = threading.Lock()
 
+PRUNE_EVERY_SEC = 300
+_last_prune = 0.0
+
 
 # ── SQLite history ────────────────────────────────────────────────────
 
@@ -41,18 +44,25 @@ def _get_conn():
 
 def log_stats(stats: dict):
     """Call this on every refresh tick to record system stats."""
+    global _last_prune
     try:
+        now = time.time()
         with _db_lock:
             conn = _get_conn()
             conn.execute(
                 "INSERT OR REPLACE INTO stats VALUES (?,?,?,?,?)",
-                (time.time(), stats["cpu"], stats["ram"], stats["disk"], stats["proc_count"])
+                (now, stats["cpu"], stats["ram"], stats["disk"], stats["proc_count"])
             )
             conn.commit()
             conn.close()
-            # Prune rows older than 7 days
-            if int(time.time()) % 300 == 0:
-                _prune_old(days=7)
+        # Prune rows older than 7 days, every PRUNE_EVERY_SEC. Outside the
+        # `with` above: _prune_old takes the same (non-reentrant) lock, and
+        # calling it while holding the lock deadlocked the refresh loop. The
+        # old `int(time.time()) % 300 == 0` test also only fired when a tick
+        # happened to land on that exact second.
+        if now - _last_prune >= PRUNE_EVERY_SEC:
+            _last_prune = now
+            _prune_old(days=7)
     except Exception as e:
         print(f"[reporter] log_stats error: {e}")
 
