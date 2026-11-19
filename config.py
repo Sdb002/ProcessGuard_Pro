@@ -15,9 +15,9 @@ DEFAULTS = {
     "autokill_rules": [],          # list of {name_pattern, cpu_thresh, mem_thresh, duration_sec}
     "whitelist": [
         "systemd", "init", "sshd", "bash", "sh", "python3",
-        "dearpygui", "main.py", "Xorg", "dbus-daemon",
-        "NetworkManager", "code", "gnome", "kwin", "plasmashell"
-    ],
+        "Xorg", "dbus-daemon", "NetworkManager", "code",
+        "gnome-*", "kwin*", "plasmashell"
+    ],                             # exact process names, or globs (see kill_manager)
     "theme": "dark_green",
     "max_table_rows": 200,
     "report_top_n": 50,

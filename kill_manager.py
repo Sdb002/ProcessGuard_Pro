@@ -2,12 +2,14 @@
 kill_manager.py — Safely kill, suspend, or resume processes.
 Upgrades:
   - Whitelist loaded from config (not hardcoded)
-  - Regex/glob pattern matching instead of substring
+  - Whitelist entries match whole process names (case-insensitive), with
+    shell-style globs: "sh" protects sh but not flash_worker; "gnome-*"
+    protects gnome-shell, gnome-session, ...
   - Kills by signal (SIGTERM first, then SIGKILL after grace period)
   - Returns structured result dict
 """
+import fnmatch
 import psutil
-import re
 import time
 import logging
 import os
@@ -23,20 +25,16 @@ logging.basicConfig(
 )
 
 
-def _compile_whitelist():
-    raw = config.get("whitelist") or []
-    patterns = []
-    for w in raw:
-        try:
-            patterns.append(re.compile(re.escape(w), re.IGNORECASE))
-        except re.error:
-            patterns.append(re.compile(re.escape(w), re.IGNORECASE))
-    return patterns
-
-
 def _is_whitelisted(name: str) -> bool:
-    for pat in _compile_whitelist():
-        if pat.search(name):
+    """True when `name` is a whitelisted process name or matches a glob.
+
+    Whole-name matching: the old substring search made "sh" protect every
+    process with "sh" anywhere in its name (flash_worker, refresh-daemon,
+    crashpad_handler), so auto-kill silently skipped them.
+    """
+    name = (name or "").lower()
+    for entry in config.get("whitelist") or []:
+        if fnmatch.fnmatchcase(name, entry.strip().lower()):
             return True
     return False
 
