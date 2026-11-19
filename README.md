@@ -64,7 +64,7 @@ processguard_pro/
 ├── main.py                ← GUI entry point (tabs, thread-safe queue)
 ├── config.py              ← JSON config manager (thresholds, whitelist, rules)
 ├── process_scanner.py     ← psutil data layer + per-process history rings
-├── kill_manager.py        ← kill/suspend/resume/nice with regex whitelist
+├── kill_manager.py        ← kill/suspend/resume/nice with a name/glob whitelist
 ├── alert_engine.py        ← CPU/RAM/Disk alerts, JSONL log, cooldown
 ├── autokill_engine.py     ← Rule-based auto-kill with duration tracking
 ├── reporter.py            ← SQLite history + HTML reports with sparklines
@@ -137,7 +137,7 @@ It covers config persistence and reset, whitelist matching, suspend/resume/kill/
 - Sliders for CPU/RAM/Disk alert thresholds and cooldown period
 - Slider for refresh interval (0.5s–10s)
 - Max table rows control
-- Multi-line whitelist editor (one entry per line, supports regex)
+- Multi-line whitelist editor (one process name per line, globs like `gnome-*` allowed)
 - Save / Reset to defaults
 
 ---
