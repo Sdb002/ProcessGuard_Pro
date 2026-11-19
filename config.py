@@ -2,7 +2,7 @@
 config.py — Centralized configuration with JSON persistence.
 All thresholds, whitelist, auto-kill rules, and UI prefs live here.
 """
-import json, os, threading
+import copy, json, os, threading
 
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config.json")
 
@@ -34,11 +34,21 @@ def load():
             try:
                 with open(CONFIG_PATH) as f:
                     saved = json.load(f)
-                _cfg = {**DEFAULTS, **saved}
+                _cfg = {**copy.deepcopy(DEFAULTS), **saved}
                 return
             except Exception:
                 pass
-        _cfg = dict(DEFAULTS)
+        # deep copy: rules and whitelist are lists, and a shallow copy let
+        # add_autokill_rule() append to DEFAULTS itself
+        _cfg = copy.deepcopy(DEFAULTS)
+        _save_unlocked()
+
+
+def reset():
+    """Restore every setting to its default and save."""
+    global _cfg
+    with _lock:
+        _cfg = copy.deepcopy(DEFAULTS)
         _save_unlocked()
 
 

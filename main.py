@@ -256,9 +256,7 @@ def on_save_settings():
     set_status("✓  Settings saved to config.json")
 
 def on_reset_settings():
-    import config as _c
-    _c._cfg = dict(_c.DEFAULTS)
-    _c.save()
+    config.reset()
     _load_settings_values()
     set_status("✓  Settings reset to defaults")
 
